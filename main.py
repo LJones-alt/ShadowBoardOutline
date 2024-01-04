@@ -11,7 +11,7 @@ import tkinter.filedialog as fd
 class Outliner: 
     def __init__(self, filePath) :
         self.filePath = filePath 
-       
+        self.image=cv2.imread(self.filePath)
         
     def importImage(self):
         image = cv2.imread(self.filePath)
@@ -58,13 +58,17 @@ class Outliner:
         # cv2.destroyAllWindows()
         print(f"Hierarchy length {max(hierShape)}") 
         edged = cv2.Canny(image, lower-10, upper)
+        
         contours, hierarchy = cv2.findContours(edged, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
         hierShape=hierarchy.shape
+        cv2.drawContours(image, contours,-1,(0, 255, 0), 2)
+        
         for i in range(hierShape[1]):
             testhier = hierarchy[0,i,:]
             if (testhier[0]==-1 and testhier[3]==-1):
                 cv2.drawContours(image, contours[i],-1,(0, 255, 0), 2)
                 cv2.imshow(f'Image with contour {i}', image)
+                cv2.waitKey(0)  
         selected = int(input("Select the contour to use:"))
         self.contours=contours
         self.contour=contours[selected]
@@ -82,8 +86,9 @@ class Drawing:
      def __init__(self, filename, contour):
          self.fileName = filename
          self.ctr = contour
+         self.contour = contour
          self.dxf  = ezdxf.new("R2010")
-         self.emf = self.path()
+         
          
      def drawDXF(self):
         ## create DXF file
@@ -126,12 +131,10 @@ class Drawing:
         emf.EndPath()
         emf.StrokePath()
         emf.save(self.fileName + ".emf")
-        
-     
-     def saveEMF(self):
-        ret=self.emf.save(self.fileName + ".emf")
+        ret=emf.save(self.fileName + ".emf")
         print("saved file : " + self.fileName)
         return ret
+
 
 
 ## Here beings the script ##
@@ -147,16 +150,15 @@ cv2.waitKey(0)
 cv2.destroyAllWindows()
 # change the two numbers here to adapt the processing. bigger numer at end means more smoothing
 contour = outline.getCountours(processedImg, 30,60)
-outline.showContour()
+#outline.showContour()
 
 
 # ##cv2.waitKey(0)
 ## create object to contain the drawings (dxf and emf)
 draw = Drawing(filepath, contour)
 #dxf = draw.drawDXF()  ## <-- uncoment this to get a nice DXF file
-emf = draw.emf ## <-- this creates the emf file. uncomment to get emf output
-ret = draw.saveEMF()
-print(f"Made EMF file {draw.fileName}, %s" % str(ret))
+draw = draw.path() ## <-- this creates the emf file. uncomment to get emf output
+
 
 
 cv2.destroyAllWindows()
