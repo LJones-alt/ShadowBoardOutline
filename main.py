@@ -65,8 +65,9 @@ class Outliner:
             if (testhier[0]==-1 and testhier[3]==-1):
                 cv2.drawContours(image, contours[i],-1,(0, 255, 0), 2)
                 cv2.imshow(f'Image with contour {i}', image)
+        selected = int(input("Select the contour to use:"))
         self.contours=contours
-        self.contour=contours[i]
+        self.contour=contours[selected]
         return contours[i]
         
     def showContour(self):
@@ -136,106 +137,6 @@ class Drawing:
 ## Here beings the script ##
 filepath = fd.askopenfilename()
 
-# ## tweak the threshold settings
-# # ##image = cv2.imread("/Users/Laura Jones/source/repos/openPython/test.jpg")
-# image = cv2.imread(filepath)
-# # cv2.waitKey(0)
-# gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-# ret,baseline = cv2.threshold(gray,127,255,cv2.THRESH_TRUNC)
-# im_floodfill = baseline.copy()
-# h,w = baseline.shape[:2]
-# mask = np.zeros((h+2 , w+2), np.uint8)
-# cv2.floodFill(im_floodfill, mask, (0,0), 255)
-# inv = cv2.bitwise_not(im_floodfill)
-# foreground = cv2.threshold(inv,126,255,cv2.THRESH_BINARY_INV)
-# cv2.imshow("floodfill test ", im_floodfill)
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
-# ret,background = cv2.threshold(im_floodfill,80,255,cv2.THRESH_BINARY)
-
-# ret,foreground = cv2.threshold(im_floodfill,126,255,cv2.THRESH_BINARY_INV)
-
-# foreground = cv2.bitwise_and(image,image, mask=foreground)  # Update foreground with bitwise_and to extract real foreground
-
-# # Convert black and white back into 3 channel greyscale
-# background = cv2.cvtColor(background, cv2.COLOR_GRAY2BGR)
-
-# # Combine the background and foreground to obtain our final image
-# image = background
-
-# cv2.imshow('removed background', image)
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
-# found=False
-# lower=30
-# upper=35
-# # # Find Canny edges
-# while(lower<=upper):
-#     edged = cv2.Canny(image, lower, upper)
-#     contours, hierarchy = cv2.findContours(edged, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-#     hierShape=hierarchy.shape
-    
-#     for cnt in contours:
-#         cv2.drawContours(image,[cnt],-1,(0,0,0), 2)
-#     lower=lower+10
-
-# cv2.imshow(f'Image after edging', image)     
-# cv2.waitKey(0)  
-# cv2.destroyAllWindows()
-# print(f"Hierarchy length {max(hierShape)}") 
-# edged = cv2.Canny(image, lower-10, upper)
-# contours, hierarchy = cv2.findContours(edged, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-# hierShape=hierarchy.shape
-# for i in range(hierShape[1]):
-#     testhier = hierarchy[0,i,:]
-#     if (testhier[0]==-1 and testhier[3]==-1):
-#         cv2.drawContours(image, contours[i],-1,(0, 255, 0), 2)
-#         cv2.imshow(f'Image with contour {i}', image)
-
-
-# cv2.waitKey(0)
-
-# chosen = int(input("pick the contour: "))
-# goodcontour = contours[chosen]
-
-# dpi=10
-# x,y,width,height = cv2.boundingRect(goodcontour)
-# print(f"{x} , {y}, {height},  {width}")
-# emf=pyemf.EMF(width/5,height/5,dpi, "mm", verbose=False)  ## this still needs to be sorted and the cordinate system fixed
-
-
-
-# pen=emf.CreatePen(pyemf.PS_SOLID,3,(0x00,0x00,0x00))
-# emf.SelectObject(pen)
-# emf.SetBkMode(pyemf.TRANSPARENT)
-# emf.BeginPath()
-# emf.MoveTo(goodcontour[0,0,0],goodcontour[0,0,1])
-# for n in range(max(goodcontour.shape)-1):
-#     if n >= max(goodcontour.shape) - 1:
-#         n = 0
-#     point=goodcontour[n,0]
-#     print(f'pint : {point}, x : {point[0]}, y: {point[1]}')
-#     emf.LineTo(int(point[0]), int(point[1]))
-# emf.LineTo(goodcontour[0,0,0],goodcontour[0,0,1])
-# emf.CloseFigure()
-# emf.EndPath()
-# emf.StrokePath()
-# emf.save("savedimage"+ ".emf")
-
-################################
-
-##print(f"Test : {cnt}")
-# cv2.drawContours(image, contours[i], -1, (0, 255, 0), 3)
-# ##print(f"Test contour info : {contours}")
-# cv2.imshow('Image with select contour', image) ## this looks pretty good
-# cv2.waitKey(0)
-# goodline = contours[2]
-
-# point1 = goodline[0]
-# pointa=point1[0]
-# print(f"plot length {len(goodline)}")
-# print(f"This countour : {goodline[0]}, cooord {point1[0]}, coord x {pointa[0]}")
-
 # create the object to hold the openCV processed stuff
 outline = Outliner(filepath)
 print(f"filename : {outline.getFileName()}")
@@ -244,6 +145,7 @@ processedImg = outline.removeBackground(img)
 cv2.imshow('removed background', processedImg)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+# change the two numbers here to adapt the processing. bigger numer at end means more smoothing
 contour = outline.getCountours(processedImg, 30,60)
 outline.showContour()
 
